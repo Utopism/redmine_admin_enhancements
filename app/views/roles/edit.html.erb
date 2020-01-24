@@ -1,0 +1,56 @@
+<%
+  # RM V4.0.0 OK
+  # Smile specific :
+  # * #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+-%>
+<%= title [l(:label_role_plural), roles_path], @role.name %>
+
+<%
+  ################
+  # Smile specific : #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  unless params[:list_users]
+    # Smile specific : link to list of users
+
+-%>
+<%= link_to(t('list_users_having_this_role'), edit_role_path(@role, :list_users => 1, include_disabled: 0) ) %><br/>
+<%= link_to(t('list_users_having_this_role') + ' (Inherited)', edit_role_path(@role, list_users: 1, include_inherited: 1, include_disabled: 0) ) %>
+<br/>
+<br/>
+<%= link_to(t('list_users_having_this_role') + ' By users', edit_role_path(@role, list_users: 1, by_users: 1, include_disabled: 0) ) %><br/>
+<%= link_to(t('list_users_having_this_role') + ' By users' + ' (Inherited)', edit_role_path(@role, list_users: 1, by_users: 1, include_inherited: 1, include_disabled: 0) ) %>
+<br/>
+<br/>
+<%
+  # END -- Smile specific : #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  #######################
+-%>
+
+<%= labelled_form_for @role do |f| %>
+<%= render :partial => 'form', :locals => { :f => f } %>
+<%= submit_tag l(:button_save) %>
+<%
+  ################
+  # Smile specific : #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+-%>
+<br/>
+<%
+    end
+  else
+    # Smile specific : list users having this role
+-%>
+<%= link_to(t('edit_this role'), :action => 'edit', :id => @role) %>
+
+<%
+    unless params[:by_users]
+-%>
+<%= render :partial => 'projects' %>
+<%
+    else
+-%>
+<%= render :partial => 'members' %>
+<%
+    end
+  # END -- Smile specific : #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  #######################
+%>
+<% end %>

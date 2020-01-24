@@ -1,0 +1,184 @@
+<%
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #199041, Permissions par module, filtrer par module
+-%>
+<%= title [l(:label_role_plural), roles_path], l(:label_permissions_report) %>
+
+<%= form_tag(permissions_roles_path, :id => 'permissions_form') do %>
+<%= hidden_field_tag 'permissions[0]', '', :id => nil %>
+<div class="autoscroll">
+<table class="list permissions">
+<thead>
+    <tr>
+    <th><%=l(:label_permissions)%></th>
+    <% @roles.each do |role| %>
+    <th>
+        <%= link_to_function('',
+                             "toggleCheckboxesBySelector('input.role-#{role.id}')",
+                             :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}",
+                             :class => 'icon-only icon-checked') %>
+        <%= content_tag(role.builtin? ? 'em' : 'span', role.name) %>
+    </th>
+    <% end %>
+<%-
+    ################
+    # Smile specific #199041, Permissions par module, filtrer par module
+    # Smile specific : repeat permission name column at the end
+-%>
+    <th><%=l(:label_permissions)%></th>
+    </tr>
+</thead>
+<tbody>
+<% perms_by_module = @permissions.group_by {|p| p.project_module.to_s} %>
+<%-
+  ################
+  # Smile specific, link to show only module permissions
+  if params[:project_module].present?
+    params[:project_module] = '' if params[:project_module] == 'none'
+-%>
+<p><%=link_to( l(:label_all).capitalize + ' ' + l(:label_permissions), permissions_roles_path) %></p>
+<%-
+  end
+  # END -- Smile specific, link to show only module permissions
+  #######################
+-%>
+<% perms_by_module.keys.sort.each do |mod| %>
+<%-
+    ################
+    # Smile specific #199041, Permissions par module, filtrer par module
+    # Smile specific : hide header for not selected module
+    if params[:project_module].nil? || mod == params[:project_module]
+-%>
+    <% unless mod.blank? %>
+        <tr class="group open">
+          <td>
+            <span class="expander" onclick="toggleRowGroup(this);">&nbsp;</span>
+<%
+        ################
+        # Smile specific #199041, Permissions par module, filtrer par module
+        # Smile specific, link to show only module permissions
+-%>
+            <%= link_to( l_or_humanize(mod, :prefix => 'project_module_'), permissions_roles_path(:project_module => mod)) %>
+          </td>
+          <% @roles.each do |role| %>
+          <td class="role"><%= role.name %></td>
+          <% end %>
+<%-
+        ################
+        # Smile specific #199041, Permissions par module, filtrer par module
+        # Smile specific : repeat permission name column at the end
+-%>
+          <td></td>
+        </tr>
+<%-
+      ################
+      # Smile specific #199041, Permissions par module, filtrer par module
+      # Smile specific, link to show only module permissions
+      else
+-%>
+        <tr class="group open">
+          <td colspan="<%= @roles.size %>">
+            <%= link_to( l(:label_none).capitalize, permissions_roles_path(:project_module => 'none')) %>
+          </td>
+<%
+        # Smile specific #199041, Permissions par module, filtrer par module
+        # Smile specific : repeat permission name column at the end
+-%>
+          <td></td>
+        </tr>
+<%-
+      # END -- Smile specific #199041, Permissions par module, filtrer par module
+      #######################
+-%>
+    <% end %>
+<%-
+    ################
+    # Smile specific #199041, Permissions par module, filtrer par module
+    end # if params[:project_module].nil? || mod == params[:project_module]
+-%>
+    <% perms_by_module[mod].each do |permission| %>
+<%-
+      ################
+      # Smile specific #199041, Permissions par module, filtrer par module
+      if params[:project_module].nil? || mod == params[:project_module]
+-%>
+        <% humanized_perm_name = l_or_humanize(permission.name, :prefix => 'permission_') %>
+        <tr class="permission-<%= permission.name %>">
+        <td class="name">
+            <%= link_to_function('',
+                                 "toggleCheckboxesBySelector('.permission-#{permission.name} input')",
+                                 :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}",
+                                 :class => 'icon-only icon-checked') %>
+            <%= humanized_perm_name %>
+        </td>
+        <% @roles.each do |role| %>
+          <% if role.setable_permissions.include? permission %>
+<%
+            ################
+            # Smile specific #199041, Permissions par module, filtrer par module
+            # Smile specific : add module to title
+-%>
+            <td title="<%= "#{l_or_humanize(( mod.present? ? mod : l('label_none') ), :prefix => 'project_module_')} / #{humanized_perm_name} (#{role.name})" %>">
+          <%= check_box_tag "permissions[#{role.id}][]", permission.name, (role.permissions.include? permission.name), :id => nil, :class => "role-#{role.id}" %>
+            </td>
+          <% else %>
+            <td></td>
+          <% end %>
+        <% end %>
+<%-
+        ################
+        # Smile specific #199041, Permissions par module, filtrer par module
+        # Smile specific : repeat permission name column at the end
+-%>
+          <td class="name"><%= l_or_humanize(permission.name, :prefix => 'permission_') %></td>
+        </tr>
+<%
+      ################
+      # Smile specific #199041, Permissions par module, filtrer par module
+      # Smile specific : not selected module, replace checkbox by hidden field
+      else
+        @roles.each do |role|
+         if (role.setable_permissions.include? permission) && (role.permissions.include? permission.name)
+-%>
+        <%= hidden_field_tag "permissions[#{role.id}][]", permission.name, :id => nil %>
+<%
+          end # if role.setable_permissions.include? permission
+        end # @roles.each do |role|
+      end # if params[:project_module].nil? || mod == params[:project_module]
+-%>
+    <% end %>
+<% end %>
+</tbody>
+<%
+  ################
+  # Smile specific #199041, Permissions par module, filtrer par module
+  # Smile specific : repeat header line at the end
+-%>
+<tfoot>
+  <tr>
+  <th><%=l(:label_permissions)%></th>
+    <% @roles.each do |role| %>
+  <th>
+      <%= content_tag(role.builtin? ? 'em' : 'span', h(role.name)) %>
+      <%= link_to_function(image_tag('toggle_check.png'), "toggleCheckboxesBySelector('input.role-#{role.id}')",
+                                                          :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}") %>
+  </th>
+    <% end %>
+<%
+    ################
+    # Smile specific #199041, Permissions par module, filtrer par module
+    # Smile specific : repeat permission name column at the end
+-%>
+  <th><%=l(:label_permissions)%></th>
+  </tr>
+</tfoot>
+<%
+  # END -- Smile specific #199041, Permissions par module, filtrer par module
+  #######################
+-%>
+</table>
+</div>
+<p><%= check_all_links 'permissions_form' %></p>
+<p><%= submit_tag l(:button_save) %></p>
+<% end %>

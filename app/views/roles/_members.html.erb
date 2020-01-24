@@ -1,0 +1,95 @@
+<%
+  # RM V4.0.0 OK
+  # Smile specific :
+  # * #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  #   new view template
+-%>
+<br/>
+<br/>
+<div class="box" id="projects">
+<h3><%= l(:label_project_plural) %></h3>
+<%
+  projects_by_members = {}
+  include_inherited = params[:include_inherited]
+  include_disabled = params[:include_disabled]
+  group_by_user = params[:group_by_user]
+
+  @role.member_roles.each do |member_role|
+    if member_role.member
+      member_projet = member_role.member.project
+    else
+      member_project = nil
+    end
+
+    next if member_projet.nil?
+
+    project_member = member_role.member.user
+    if project_member.nil?
+      project_member = Group.find_by_id(member_role.member.user_id)
+    else
+      next unless project_member.active? || (include_disabled == '1')
+    end
+
+    inherited_tag = ''
+
+    if member_role.inherited_from.present?
+      if include_inherited
+        inherited_member_role = MemberRole.find_by_id(member_role.inherited_from)
+        if inherited_member_role
+          inherited_tag = "#{inherited_member_role.member.project}: #{inherited_member_role.role} >> "
+        end
+      else
+        next
+      end
+    end
+
+    projects_by_members[project_member] ||= []
+
+    projects_by_members[project_member] <<
+      [member_projet.id, member_projet.name, inherited_tag]
+  end
+
+  project_members_keys_sorted = projects_by_members.keys.sort {|x,y| x.name <=> y.name}
+
+  i = 0
+  project_members_keys_sorted.each do |member|
+    i += 1
+-%>
+  <fieldset>
+    <legend>
+      <%= i %>)
+<%
+    if member.is_a?(User)
+-%>
+    <%= link_to( h(member.name), user_path(member.id) ) %> (<%= member.mail %>)<br/>
+<%
+    else
+-%>
+    <%= l(:label_group) %> <%= link_to( h(member.name), group_path(member.id) ) %>
+<%
+    end
+-%>
+    </legend>
+<%
+    projects_for_member = projects_by_members[member]
+    projects_for_member.sort!{|x,y| x[1] <=> y[1]}
+    projects_for_member.sort!{|x,y| x[2] <=> y[2]}
+
+    projects_for_member.each do |project_infos|
+-%>
+<%
+      if project_infos[2]
+-%>
+    <span style="font-size: larger"><%= project_infos[2] %></span>
+<%
+      end
+-%>
+    <%= link_to( h(project_infos[1]), settings_project_path(project_infos[0], tab: 'members') ) %><br/>
+<%
+    end
+-%>
+  </fieldset>
+<%
+  end
+-%>
+</div>

@@ -1,0 +1,128 @@
+<%
+  # Smile specific
+  # RM V4.0.0 OK
+  # * #185847 Admin : améliorations grille des statuts de workflow
+-%>
+<table class="list workflows transitions transitions-<%= name %>">
+<thead>
+  <tr>
+    <th>
+      <%= link_to_function('', "toggleCheckboxesBySelector('table.transitions-#{name} input[type=checkbox]:not(:disabled)')",
+                           :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}",
+                           :class => 'icon-only icon-checked') %>
+      <%=l(:label_current_status)%>
+    </th>
+    <th colspan="<%= @statuses.length %>"><%=l(:label_new_statuses_allowed)%></th>
+<%
+  ################
+  # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+  # Repeat statuses
+-%>
+    <th></th>
+  </tr>
+  <tr>
+    <td></td>
+<%
+    ################
+    # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+    new_status_worflows_present = {}
+-%>
+    <% for new_status in @statuses %>
+<%
+      ################
+      # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      if @used_statuses_only
+        new_status_worflows_present[new_status.id] = workflows.detect {|w| w.new_status == new_status}.present?
+      end
+
+      if !@used_statuses_only || new_status_worflows_present[new_status.id]
+      # END -- Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      #######################
+-%>
+    <td style="width:<%= 75 / @statuses.size %>%;">
+      <%= link_to_function('', "toggleCheckboxesBySelector('table.transitions-#{name} input[type=checkbox]:not(:disabled).new-status-#{new_status.id}')",
+                           :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}",
+                           :class => 'icon-only icon-checked') %>
+      <%= new_status.name %>
+    </td>
+<%
+      ################
+      # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      end
+-%>
+    <% end %>
+<%
+    ################
+    # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+    # Repeat statuses
+-%>
+    <td></td>
+  </tr>
+</thead>
+<tbody>
+  <% for old_status in [nil] + @statuses %>
+  <% next if old_status.nil? && name != 'always' %>
+<%
+      ################
+      # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      if @used_statuses_only
+        old_status_worflows_present = workflows.detect {|w| w.old_status == old_status}.present?
+      end
+
+      if !@used_statuses_only || old_status_worflows_present
+      # END -- Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      #######################
+-%>
+  <tr>
+    <td class="name">
+      <%= link_to_function('', "toggleCheckboxesBySelector('table.transitions-#{name} input[type=checkbox]:not(:disabled).old-status-#{old_status.try(:id) || 0}')",
+                           :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}",
+                           :class => 'icon-only icon-checked') %>
+      <% if old_status %>
+        <% old_status_name = old_status.name %>
+        <%= old_status_name %>
+      <% else %>
+        <% old_status_name = l(:label_issue_new) %>
+        <%= content_tag('em', old_status_name) %>
+      <% end %>
+    </td>
+    <% for new_status in @statuses -%>
+    <% checked = (old_status == new_status) || workflows.detect {|w| w.old_status == old_status && w.new_status == new_status} %>
+<%
+        ################
+        # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+        if !@used_statuses_only || new_status_worflows_present[new_status.id]
+-%>
+    <td class="<%= checked ? 'enabled' : '' %>" title="<%= old_status_name %> &#187; <%= new_status.name %>">
+      <%= transition_tag workflows, old_status, new_status, name %>
+    </td>
+    <% end -%>
+<%
+        ########################
+        # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+        end
+
+        # Repeat statuses
+-%>
+    <td>
+      <% if old_status %>
+        <% old_status_name = old_status.name %>
+        <%= old_status_name %>
+      <% else %>
+        <% old_status_name = l(:label_issue_new) %>
+        <%= content_tag('em', old_status_name) %>
+      <% end %>
+    </td>
+<%
+        # END -- Smile specific #185847 Admin : améliorations grille des statuts de workflow
+        ###############################
+-%>
+  </tr>
+<%
+      ########################
+      # Smile specific #185847 Admin : améliorations grille des statuts de workflow
+      end # if !@used_statuses_only || old_status_worflows_present
+%>
+  <% end %>
+</tbody>
+</table>

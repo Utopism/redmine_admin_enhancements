@@ -1,0 +1,21 @@
+<%
+      ################
+      # Smile specific #114684 Add a new mandatory flag to the trackers
+      if @tracker_readonly
+-%>
+      <%= hidden_field_tag('project[tracker_ids][]', tracker.id) %>
+<%
+      end
+      # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+      #######################
+
+      ################
+      # Smile specific #781209 V4.0.0 : Project trackers setting : ability to remove mandatory tracker for admins
+      if @tracker_mandatory_label
+-%>
+      <span title="<%= l(:field_mandatory)%>"><font color="red">(M)</font></span>
+<%
+      end
+      # END -- Smile specific #781209 V4.0.0 : Project trackers setting : ability to remove mandatory tracker for admins
+      #######################
+-%>

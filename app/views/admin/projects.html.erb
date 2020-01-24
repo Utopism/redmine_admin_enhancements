@@ -1,0 +1,134 @@
+<%
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #156114 Projects admin, show issues count
+  # * #416615 Projects admin, show parent project if projects filtered
+  # * #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
+-%>
+<div class="contextual">
+<%= link_to l(:label_project_new), new_project_path, :class => 'icon icon-add' %>
+</div>
+
+<%
+  ################
+  # Smile specific #156114 Projects admin, show issues count
+  display_counts = params[:parent].present? || params[:name].present?
+  # END -- Smile specific #156114 Projects admin, show issues count
+  #######################
+
+  # Smile specific : #156114 Projects admin, show issues count
+-%>
+<%= title l(:label_project_plural) + " (#{@projects.size})" %>
+
+<%= form_tag({}, :method => :get) do %>
+<fieldset><legend><%= l(:label_filter_plural) %></legend>
+<label for='status'><%= l(:field_status) %>:</label>
+<%= select_tag 'status', project_status_options_for_select(@status), :class => "small", :onchange => "this.form.submit(); return false;"  %>
+<label for='name'><%= l(:label_project) %>:</label>
+<%= text_field_tag 'name', params[:name], :size => 30 %>
+<%
+  ################
+  # Smile specific #156114 Projects admin, show issues count
+-%>
+<br/>
+<label><%=l(:field_parent)%> :</label>
+<%= text_field_tag 'parent', params[:parent], :size => 60 %>
+<%
+  # END -- Smile specific #156114 Projects admin, show issues count
+  #######################
+-%>
+<%= submit_tag l(:button_apply), :class => "small", :name => nil %>
+<%= link_to l(:button_clear), admin_projects_path, :class => 'icon icon-reload' %>
+</fieldset>
+<% end %>
+&nbsp;
+
+<% if @projects.any? %>
+<div class="autoscroll">
+<table class="list">
+  <thead><tr>
+  <th><%=l(:label_project)%></th>
+<%
+  ###############################
+  # Smile specific : + identifier
+-%>
+  <th><%=l(:field_identifier)%></th>
+  <th><%=l(:field_is_public)%></th>
+<%
+  ################
+  # Smile specific #156114 Projects admin, show issues count
+  # Smile specific #416615 Projects admin, show parent project if projects filtered
+  if display_counts then
+-%>
+    <th><%=l(:label_issue_plural) %> (<%= l(:label_open_issues_plural) %>)<br/><%= l(:label_member_plural) %> / <%= l(:label_subproject_plural) %></th>
+    <th><%=l(:field_parent) %></th>
+<%
+  end
+  # END -- Smile specific #156114 Projects admin, show issues count
+  #######################
+-%>
+  <th><%=l(:field_created_on)%></th>
+  <th></th>
+  </tr></thead>
+  <tbody>
+<% project_tree(@projects, :init_level => true) do |project, level| %>
+  <tr class="<%= project.css_classes %> <%= level > 0 ? "idnt idnt-#{level}" : nil %>">
+  <td class="name"><span><%= link_to_project_settings(project, {}, :title => project.short_description) %></span></td>
+<%
+  ###############################
+  # Smile specific : + identifier
+-%>
+  <td style="text-align:left"><%= project.identifier %></td>
+  <td><%= checked_image project.is_public? %></td>
+<%
+  ################
+  # Smile specific #156114 Projects admin, show issues count
+  if display_counts
+    p_children_count = project.descendants.count
+    label_children_count = p_children_count.to_s
+    if p_children_count > 0
+      label_children_count = "<b><font color=\"red\">#{label_children_count}</font></b>".html_safe
+    end
+-%>
+  <td><b><%=  Issue.where(:project_id => project.id).count %></b> (<%= Issue.open.where(:project_id => project.id).count %>)<br/><%= project.members.count %> / <%= label_children_count %></td>
+  <td>
+<%
+    # Smile specific #416615 Projects admin, show parent project if projects filtered
+    if project.parent
+-%>
+    <span><%= link_to_project_settings(project.parent, {}, :title => project.parent.short_description) %></span>
+<%
+    end
+-%>
+  </td>
+<%
+  end
+  # END -- Smile specific #156114 Projects admin, show issues count
+  #######################
+-%>
+  <td><%= format_date(project.created_on) %></td>
+  <td class="buttons">
+<%
+  ################
+  # Smile specific #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
+  # Smile specific : params added name, parent
+-%>
+    <%= link_to(l(:button_archive), archive_project_path(project, :status => params[:status], :name => params[:name], :parent => params[:parent]), :data => {:confirm => l(:text_are_you_sure)}, :method => :post, :class => 'icon icon-lock') unless project.archived? %>
+<%
+  ################
+  # Smile specific #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
+  # Smile specific : params added name, parent
+-%>
+    <%= link_to(l(:button_unarchive), unarchive_project_path(project, :status => params[:status], :name => params[:name], :parent => params[:parent]), :method => :post, :class => 'icon icon-unlock') if project.archived? %>
+    <%= link_to(l(:button_copy), copy_project_path(project), :class => 'icon icon-copy') %>
+    <%= link_to(l(:button_delete), project_path(project), :method => :delete, :class => 'icon icon-del') %>
+  </td>
+  </tr>
+<% end %>
+  </tbody>
+</table>
+</div>
+<span class="pagination"><%= pagination_links_full @project_pages, @project_count %></span>
+<% else %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

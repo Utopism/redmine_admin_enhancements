@@ -1,0 +1,45 @@
+<%
+  ##################
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+  #   2012
+  # * #787756 Role : add exception to settable flag if user member of a group
+-%>
+<fieldset class="box">
+  <legend><%= label_tag("principal_search", l(:label_principal_search)) %></legend>
+  <p><%= text_field_tag('principal_search', nil) %></p>
+  <%= javascript_tag "observeSearchfield('principal_search', null, '#{ escape_javascript autocomplete_project_memberships_path(@project, :format => 'js') }')" %>
+  <div id="principals_for_new_member">
+    <%= render_principals_for_new_members(@project) %>
+  </div>
+</fieldset>
+<fieldset class="box">
+  <legend><%= toggle_checkboxes_link('.roles-selection input') %><%= l(:label_role_plural) %></legend>
+  <div class="roles-selection">
+<%
+    ################
+    # Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+    # Smile comment : UPSTREAM code
+    # User.current.managed_roles(@project).each do |role|
+    managed_roles_on_project = User.current.managed_roles(@project)
+    roles_only_settable = Role.exclude_unsettable(managed_roles_on_project, params[:debug].present?)
+    roles_only_unsettable = Role.only_unsettable(managed_roles_on_project)
+-%>
+    <% roles_only_settable.each do |role| %>
+<%
+      ################
+      # Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+      # Smile specific #787756 Role : add exception to settable flag if user member of a group
+      if role.respond_to?(:settable?) && !role.settable?
+        class_unsettable = ' class="unsettable"'.html_safe
+      else
+        class_unsettable = ''
+      end
+
+      # Smile specific : class_unsettable
+-%>
+      <label<%= class_unsettable %>><%= check_box_tag 'membership[role_ids][]', role.id, false, :id => nil %> <%= role %></label>
+    <% end %>
+  </div>
+</fieldset>

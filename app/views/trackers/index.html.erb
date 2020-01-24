@@ -1,0 +1,84 @@
+<%
+  # Smile specific
+  # RM V4.0.0 OK
+  # * #114684 Add a new mandatory flag to the trackers
+-%>
+<div class="contextual">
+<%= link_to l(:label_tracker_new), new_tracker_path, :class => 'icon icon-add' %>
+<%= link_to l(:field_summary), fields_trackers_path, :class => 'icon icon-summary' %>
+</div>
+
+<h2><%=l(:label_tracker_plural)%></h2>
+
+<table class="list trackers">
+  <thead><tr>
+  <th><%=l(:label_tracker)%></th>
+  <th><%=l(:field_default_status)%></th>
+  <th></th>
+<%
+  ################
+  # Smile specific #114684 Add a new mandatory flag to the trackers
+-%>
+  <th><%=l(:field_mandatory)%></th>
+  <th></th>
+  <th><%=l(:label_default)%></th>
+  <th></th>
+<%
+  # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+  #######################
+-%>
+  <th></th>
+  </tr></thead>
+  <tbody>
+<%
+  ################
+  # Smile specific #114684 Add a new mandatory flag to the trackers
+  default_tracker_ids = Setting.default_projects_tracker_ids
+  if default_tracker_ids.is_a?(Array)
+    default_trackers = Tracker.where(:id => default_tracker_ids.map(&:to_i)).sorted.all
+  else
+    default_trackers = Tracker.sorted.all
+  end
+  # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+  #######################
+-%>
+<% for tracker in @trackers %>
+  <tr>
+  <td class="name"><%= link_to tracker.name, edit_tracker_path(tracker) %></td>
+  <td><%= tracker.default_status.name %></td>
+  <td>
+    <% unless tracker.workflow_rules.exists? %>
+      <span class="icon icon-warning">
+        <%= l(:text_tracker_no_workflow) %> (<%= link_to l(:button_edit), workflows_edit_path(:tracker_id => tracker) %>)
+      </span>
+    <% end %>
+  </td>
+<%
+  ################
+  # Smile specific #114684 Add a new mandatory flag to the trackers
+-%>
+  <td align="center"><%= image_tag("#{ tracker.mandatory ? 'true' : 'false'}.png", :alt => (tracker.mandatory ? l(:general_text_Yes) : l(:general_text_No))) %></td>
+  <td></td>
+<%
+    default_tracker = default_trackers.include?(tracker)
+-%>
+  <td align="center"><%= image_tag("#{ default_tracker ? 'true' : 'false'}.png", :alt => (default_tracker ? l(:general_text_Yes) : l(:general_text_No))) %></td>
+  <td></td>
+<%
+  # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+  #######################
+-%>
+  <td class="buttons">
+    <%= reorder_handle(tracker) %>
+    <%= delete_link tracker_path(tracker) %>
+  </td>
+  </tr>
+<% end %>
+  </tbody>
+</table>
+
+<% html_title(l(:label_tracker_plural)) -%>
+
+<%= javascript_tag do %>
+  $(function() { $("table.trackers tbody").positionedItems(); });
+<% end %>

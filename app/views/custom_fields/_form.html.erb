@@ -1,0 +1,317 @@
+<%
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #78210 List of projects using an Issue custom field
+  #   2012
+  #
+  # * #322775 List of projects using a project custom field
+  #   2015
+  #
+  # * #321160 Role-based project custom field editability
+  # * #322539 Utilisation d'un nouveau champ *settable*
+  # * #781516 V4.0.0 : Custom Field edition : do not localize name
+-%>
+<%= error_messages_for 'custom_field' %>
+
+<div class="splitcontentleft">
+<div class="box tabular">
+<p><%= f.select :field_format, custom_field_formats_for_select(@custom_field), {}, :disabled => !@custom_field.new_record? %></p>
+<%
+  ################
+  # Smile specific #781516 V4.0.0 : Custom Field edition : do not localize name
+  if defined?(Localizable)
+    cf_name = @custom_field.name(true)
+  else
+    cf_name = @custom_field.name
+  end
+%>
+<p><%= f.text_field :name, :size => 50, :required => true, :value => cf_name %></p>
+<p><%= f.text_area :description, :rows => 7 %></p>
+
+<% if @custom_field.format.multiple_supported %>
+<p>
+  <%= f.check_box :multiple %>
+  <% if !@custom_field.new_record? && @custom_field.multiple %>
+  <em class="info"><%= l(:text_turning_multiple_off) %></em>
+  <% end %>
+</p>
+<% end %>
+
+<%= render_custom_field_format_partial f, @custom_field %>
+
+<%= call_hook(:view_custom_fields_form_upper_box, :custom_field => @custom_field, :form => f) %>
+</div>
+<p><%= submit_tag l(:button_save) %></p>
+<%
+  ################
+  # Smile specific #78210 List of projects using an Issue custom field
+  # Smile specific : issue CF, read-only list, only projects with CF enabled
+  if (
+    !@custom_field.new_record? &&
+    @custom_field.is_a?(IssueCustomField)
+  )
+%>
+  <fieldset class="box" id="custom_field_project_ids_readonly">
+<%
+    custom_field_projects = @custom_field.projects
+-%>
+    <legend><%= l(:label_custom_field) %> <%= l(:label_used_by) %> <%= l(:label_project_plural) %> (<%= custom_field_projects.size %>)</legend>
+<%
+    if custom_field_projects.any?
+      custom_field_projects_including_ancestors = custom_field_projects.dup
+      custom_field_projects.each{|p|
+        custom_field_projects_including_ancestors += p.ancestors
+      }
+      custom_field_projects_including_ancestors.uniq!
+-%>
+      <%= render_project_nested_lists(custom_field_projects_including_ancestors) do |p|
+        content_tag('label', check_box_tag("readonly_custom_field_project_ids_#{p.id}", p.id, custom_field_projects.to_a.include?(p), :id => nil, :disabled => true) + ' ' + link_to_project_settings(p))
+      end %>
+<%
+    else
+      if !@custom_field.is_required
+-%>
+  <b><%= t('label_x_projects.zero') %></b>
+<%
+      else
+-%>
+  <b><%= t('field_is_for_all') %></b>
+<%
+      end
+    end
+-%>
+  </fieldset>
+<%
+  end # Issue CF
+  # END -- Smile specific #78210 List of projects using an Issue custom field
+  #######################
+-%>
+<%
+  ################
+  # Smile specific #322775 List of projects where project boolean custom field is enabled
+  # Smile specific : project Boolean CF, read-only list, only projects with CF enabled
+  if (
+    !@custom_field.new_record? &&
+    (
+      @custom_field.is_a?(ProjectCustomField) &&
+      @custom_field.field_format == 'bool'
+    )
+  )
+
+    show_all_projects = params[:show_all_projects].present? && params[:show_all_projects] == '1'
+
+    bool_custom_value_set_on_projects = @custom_field.project_ids.collect{|p| Project.find_by_id(p)}
+    if show_all_projects
+      custom_field_projects = Project.all
+    else
+      custom_field_projects = bool_custom_value_set_on_projects.dup
+      bool_custom_value_set_on_projects.each{|p|
+        custom_field_projects += p.ancestors
+      }
+      custom_field_projects.uniq!
+    end
+
+    unless show_all_projects
+%>
+  <%= link_to "#{l(:button_show)} #{l(:label_project_all)}", edit_custom_field_path(@custom_field, :show_all_projects => 1) %>
+  <br/>
+  <br/>
+<%
+    end
+-%>
+  <fieldset class="box" id="custom_field_bool_custom_value_set_on_readonly">
+    <legend><%= l(:label_custom_field) %> <%= l(:label_boolean) %> <%= l(:label_used_by) %> <%= l(:label_project_plural) %> (<%= bool_custom_value_set_on_projects.size %>)</legend>
+<%
+    if !@custom_field.is_required
+-%>
+      <%= render_project_nested_lists(custom_field_projects) do |p|
+        content_tag('label', check_box_tag("readonly_custom_field_bool_custom_value_set_on_#{p.id}", p.id, bool_custom_value_set_on_projects.to_a.include?(p), :id => nil, :disabled => true) + ' ' + link_to_project_settings(p))
+      end %>
+<%
+    else
+-%>
+  <b><%= t('field_is_for_all') %></b>
+<%
+    end
+-%>
+  </fieldset>
+<%
+  end # Bool project CF
+  # END -- Smile specific #322775 List of projects where project boolean custom field is enabled
+  #######################
+-%>
+</div>
+
+<div class="splitcontentright">
+<div class="box tabular">
+<% case @custom_field.class.name
+when "IssueCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+    <% if @custom_field.format.searchable_supported %>
+    <p><%= f.check_box :searchable %></p>
+    <% end %>
+
+<% when "UserCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <p><%= f.check_box :visible %></p>
+    <p><%= f.check_box :editable %></p>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+
+<% when "ProjectCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <p><%= f.check_box :visible %></p>
+    <% if @custom_field.format.searchable_supported %>
+    <p><%= f.check_box :searchable %></p>
+    <% end %>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+<%
+    ################
+    # Smile specific #321160 Role-based project custom field editability
+    # Smile specific : project CF, editable radio button + roles list
+-%>
+    <p>
+      <label><%= l(:field_editable) %></label>
+      <label class="block">
+        <%= radio_button_tag 'custom_field[editable]', 1, @custom_field.editable?, :id => 'custom_field_editable_on',
+              :data => {:disables => '.custom_field_role input'} %>
+        <%= l(:label_visibility_public) %>
+      </label>
+      <label class="block">
+        <%= radio_button_tag 'custom_field[editable]', 0, !@custom_field.editable?, :id => 'custom_field_editable_off',
+              :data => {:enables => '.custom_field_role input'} %>
+        <%= l(:label_visibility_roles) %>:
+      </label>
+      <% Role.givable.sorted.each do |role| %>
+        <label class="block custom_field_role" style="padding-left:2em;">
+          <%= check_box_tag 'custom_field[role_ids][]', role.id, @custom_field.roles.include?(role), :id => nil %>
+          <%= role.name %>
+        </label>
+      <% end %>
+      <%= hidden_field_tag 'custom_field[role_ids][]', '' %>
+    </p>
+<%
+    # END -- Smile specific #321160 Role-based project custom field editability
+    #######################
+-%>
+
+<% when "VersionCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+
+<% when "GroupCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+
+<% when "TimeEntryCustomField" %>
+    <p><%= f.check_box :is_required %></p>
+    <% if @custom_field.format.is_filter_supported %>
+    <p><%= f.check_box :is_filter %></p>
+    <% end %>
+
+<% else %>
+    <p><%= f.check_box :is_required %></p>
+
+<% end %>
+<%= call_hook(:"view_custom_fields_form_#{@custom_field.type.to_s.underscore}", :custom_field => @custom_field, :form => f) %>
+</div>
+
+<% if @custom_field.is_a?(IssueCustomField) %>
+
+  <fieldset class="box tabular"><legend><%= l(:field_visible) %></legend>
+    <label class="block">
+      <%= radio_button_tag 'custom_field[visible]', 1, @custom_field.visible?, :id => 'custom_field_visible_on',
+            :data => {:disables => '.custom_field_role input'} %>
+      <%= l(:label_visibility_public) %>
+    </label>
+    <label class="block">
+      <%= radio_button_tag 'custom_field[visible]', 0, !@custom_field.visible?, :id => 'custom_field_visible_off',
+            :data => {:enables => '.custom_field_role input'} %>
+      <%= l(:label_visibility_roles) %>:
+    </label>
+    <% role_ids = @custom_field.role_ids %>
+<%
+  ################
+  # Smile specific #322539 Utilisation d'un nouveau champ *settable*
+  givable_roles_sorted = Role.givable.sorted
+  cf_roles_only_settable = Role.exclude_unsettable(givable_roles_sorted, params[:debug].present?)
+  cf_roles_only_unsettable = Role.only_unsettable(givable_roles_sorted)
+-%>
+    <% cf_roles_only_settable.each do |role| %>
+<%
+    ################
+    # Smile specific #322539 Utilisation d'un nouveau champ *settable*
+    role_label = role.name
+    if cf_roles_only_unsettable.include?(role)
+      role_label = "<span class=\"unsettable\">#{h(role_label)}</span>".html_safe
+    end
+-%>
+      <label class="block custom_field_role" style="padding-left:2em;">
+        <%= check_box_tag 'custom_field[role_ids][]', role.id, role_ids.include?(role.id), :id => nil %>
+<%
+    ################
+    # Smile specific #322539 Utilisation d'un nouveau champ *settable*
+    # Smile specific role.name -> role_label
+-%>
+        <%= role_label %>
+      </label>
+    <% end %>
+    <%= hidden_field_tag 'custom_field[role_ids][]', '' %>
+  </fieldset>
+
+  <fieldset class="box" id="custom_field_tracker_ids"><legend><%= toggle_checkboxes_link("#custom_field_tracker_ids input[type=checkbox]") %><%=l(:label_tracker_plural)%></legend>
+  <% tracker_ids = @custom_field.tracker_ids %>
+  <% Tracker.sorted.each do |tracker| %>
+    <%= check_box_tag "custom_field[tracker_ids][]",
+                      tracker.id,
+                      tracker_ids.include?(tracker.id),
+                      :id => "custom_field_tracker_ids_#{tracker.id}" %>
+    <label class="no-css" for="custom_field_tracker_ids_<%=tracker.id%>">
+      <%= tracker.name %>
+    </label>
+  <% end %>
+  <%= hidden_field_tag "custom_field[tracker_ids][]", '' %>
+  </fieldset>
+<%
+  ################
+  # Smile specific #322775 List of projects where project boolean custom field is enabled
+  # - Enabled projects list for Project custom fields
+-%>
+<% end # Issue CF %>
+<% if @custom_field.is_a?(IssueCustomField) || @custom_field.is_a?(ProjectCustomField) %>
+<%
+  # Smile specific #322775 List of projects where project boolean custom field is enabled
+  ################
+
+
+  ################
+  # Smile specific #322775 List of projects where project boolean custom field is enabled
+  # - Display projects enabled size
+-%>
+  <fieldset class="box"><legend><%= toggle_checkboxes_link("#custom_field_project_ids input[type=checkbox]:enabled") %><%= l(:label_project_plural) %> (<%= @custom_field.project_ids.size %>)</legend>
+    <p><%= f.check_box :is_for_all, :data => {:disables => '#custom_field_project_ids input'} %></p>
+
+    <div id="custom_field_project_ids">
+      <% project_ids = @custom_field.project_ids.to_a %>
+      <%= render_project_nested_lists(Project.all) do |p|
+        content_tag('label', check_box_tag('custom_field[project_ids][]', p.id, project_ids.include?(p.id), :id => nil) + ' ' + p)
+      end %>
+      <%= hidden_field_tag('custom_field[project_ids][]', '', :id => nil) %>
+    </div>
+  </fieldset>
+<% end %>
+</div>
+
+<%
+  include_calendar_headers_tags
+%>

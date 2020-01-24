@@ -1,0 +1,18 @@
+# Ukrainian translations for Redmine Smile
+# by Jérôme BATAILLE (jebat@smile.fr)
+
+uk:
+  field_mandatory: обов'язковий
+
+  permission_add_public_project: Add public project #Evolution #29527 Masquer la case "public" dans le formulaire de création de projets
+
+  #367502 Création d'un projet à partir d'un template
+  permission_copy_project: Copy project
+
+  # Change #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  list_users_having_this_role: 'Список користувачів, що мають цю роль'
+  edit_this_role: Змінити цю роль
+  # END -- Change #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+
+  #322539 Utilisation d'un nouveau champ *settable*
+  field_settable: Settable

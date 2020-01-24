@@ -1,0 +1,18 @@
+# French translations for Redmine Smile
+# by Jérôme BATAILLE (jebat@smile.fr)
+
+fr:
+  field_mandatory: Obligatoire
+
+  permission_add_public_project: Créer un projet public #Evolution #29527 Masquer la case "public" dans le formulaire de création de projets
+
+  #367502 Création d'un projet à partir d'un template
+  permission_copy_project: Copier projet
+
+  # Change #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  list_users_having_this_role: Lister les utilisteurs ayant ce rôle
+  edit_this_role: Editer ce rôle
+  # END -- Change #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+
+  #322539 Utilisation d'un nouveau champ *settable*
+  field_settable: Activable

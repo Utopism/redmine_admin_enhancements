@@ -1,0 +1,50 @@
+<%
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+  #   2012
+-%>
+<%= form_for(@member, :url => membership_path(@member),
+                      :as => :membership,
+                      :remote => request.xhr?,
+                      :method => :put) do |f| %>
+  <p>
+<%
+    ################
+    # Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+    roles_only_settable = Role.exclude_unsettable(@roles, params[:debug].present?)
+    roles_only_unsettable = Role.only_unsettable(@roles)
+-%>
+    <% @roles.each do |role| %>
+<%
+      ################
+      # Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+      member_has_role = @member.roles.to_a.include?(role)
+      next unless member_has_role || roles_only_settable.include?(role)
+
+      role_label = role.to_s
+      if roles_only_unsettable.include?(role)
+        role_label = "<span class=\"unsettable\">#{h(role_label)}</span>".html_safe
+      end
+-%>
+    <label>
+      <%= check_box_tag('membership[role_ids][]',
+                        # Smile specific : member_has_role put in variable
+                        role.id, member_has_role,
+                        :id => nil,
+                        # Smile specific : role put in variable
+                        :disabled => !@member.role_editable?(role)) %> <%= role_label %>
+    </label><br />
+<%
+      #######################
+      # END -- Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
+-%>
+    <% end %>
+  </p>
+  <%= hidden_field_tag 'membership[role_ids][]', '', :id => nil %>
+  <p>
+    <%= submit_tag l(:button_save), :class => "small" %>
+    <%= link_to_function l(:button_cancel),
+                         "$('#member-#{@member.id}-roles').show(); $('#member-#{@member.id}-form').empty(); return false;" if request.xhr? %>
+  </p>
+<% end %>

@@ -1,0 +1,18 @@
+<%
+  ################
+  # Smile specific
+  # * #782168 V4.0.0 : Plugin option to redirect all notifications to the action author
+  #   2019
+-%>
+<span style="color: #9c33ff">
+  <%= content_tag('hr') %>
+  <h2>Mails redirected to you :</h2>
+  <br/>
+
+  <u>Original recipients :</u><br/>
+<% messages_mail_transfered_to_autor.each do |k, r| %>
+  <b><%= k.capitalize %></b> : <%= r %>
+<% end %>
+<%= content_tag('hr') %>
+</span>
+<br/>

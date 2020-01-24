@@ -1,0 +1,119 @@
+<%
+  # Smile specific
+  # RM V4.0.0 OK
+  # * #114684 Add a new mandatory flag to the trackers
+  # * #786039 V4.0.0 : Tracker admin, flag to show only projects having it enabled
+  #
+  # * #143424 Tracker edit : link to project
+  #   2012
+-%>
+<%= error_messages_for 'tracker' %>
+
+<div class="splitcontentleft">
+<div class="box tabular">
+<!--[form:tracker]-->
+<p><%= f.text_field :name, :required => true %></p>
+<p><%= f.select :default_status_id,
+        IssueStatus.sorted.map {|s| [s.name, s.id]},
+        :include_blank => @tracker.default_status.nil?,
+        :required => true %>
+</p>
+<p><%= f.check_box :is_in_roadmap %></p>
+<p>
+  <label><%= l(:field_core_fields) %></label>
+  <% Tracker::CORE_FIELDS.each do |field| %>
+  <label class="block">
+    <%= check_box_tag 'tracker[core_fields][]', field, @tracker.core_fields.include?(field), :id => nil %>
+    <%= l("field_#{field}".sub(/_id$/, '')) %>
+  </label>
+  <% end %>
+</p>
+<%= hidden_field_tag 'tracker[core_fields][]', '' %>
+<%
+  ################
+  # Smile specific #114684 Add a new mandatory flag to the trackers
+  if @tracker.class.instance_methods.include?(:mandatory)
+-%>
+<p><%= f.check_box :mandatory %></p>
+<%
+  end
+  # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+  #######################
+%>
+
+<% @issue_custom_fields = IssueCustomField.sorted %>
+<% if @issue_custom_fields.present? %>
+<p>
+  <label><%= l(:label_custom_field_plural) %></label>
+  <% @issue_custom_fields.each do |field| %>
+    <label class="block">
+      <%= check_box_tag 'tracker[custom_field_ids][]',field.id, @tracker.custom_fields.to_a.include?(field), :id => nil %>
+      <%= field.name %>
+    </label>
+  <% end %>
+</p>
+<%= hidden_field_tag 'tracker[custom_field_ids][]', '' %>
+<% end %>
+
+<% if @tracker.new_record? && @trackers.any? %>
+<p><label for="copy_workflow_from"><%= l(:label_copy_workflow_from) %></label>
+<%= select_tag(:copy_workflow_from, content_tag("option") + options_from_collection_for_select(@trackers, :id, :name)) %></p>
+<% end %>
+<!--[eoform:tracker]-->
+</div>
+<%= submit_tag l(@tracker.new_record? ? :button_create : :button_save) %>
+</div>
+
+<div class="splitcontentright">
+<% if @projects.any? %>
+<%=
+  ################
+  # Smile specific #786039 V4.0.0 : Tracker admin, flag to show only projects having it enabled
+  only_enabled_projects = params[:only_enabled_projects].present? && params[:only_enabled_projects] == '1'
+
+  link_to( (only_enabled_projects ? 'All projects' : 'Only projects having tracker enabled'), edit_tracker_path(@tracker, :only_enabled_projects => (only_enabled_projects ? '' : '1')) ) unless @tracker.new_record?
+-%>
+<br/><br/>
+<fieldset class="box" id="tracker_project_ids"><legend><%= toggle_checkboxes_link("#tracker_project_ids input[type=checkbox]") %><%= l(:label_project_plural) %></legend>
+<% project_ids = @tracker.project_ids.to_a %>
+<%
+  ################
+  # Smile specific #786039 V4.0.0 : Tracker admin, flag to show only projects having it enabled
+  if only_enabled_projects
+    projects_having_tracker_enabled = Project.where(:id => project_ids).to_a
+    projects_having_tracker_enabled_or_parent = projects_having_tracker_enabled.dup
+
+    projects_having_tracker_enabled.each do |p|
+      projects_having_tracker_enabled_or_parent += p.ancestors.to_a
+    end
+    projects_having_tracker_enabled_or_parent.uniq!
+
+    projects_not_having_tracker_enabled_or_parent = @projects - projects_having_tracker_enabled_or_parent
+  else
+    projects_having_tracker_enabled_or_parent = @projects
+  end
+  # END -- Smile specific #786039 V4.0.0 : Tracker admin, flag to show only projects having it enabled
+  #######################
+
+  # Smile specific : @projects -> projects_having_tracker_enabled_or_parent
+%>
+<%= render_project_nested_lists(projects_having_tracker_enabled_or_parent) do |p|
+  ################
+  # Smile specific #143424 Tracker edit : link to project instead of h
+  content_tag('label', check_box_tag('tracker[project_ids][]', p.id, project_ids.include?(p.id), :id => nil) + ' ' + link_to(p, p))
+end %>
+<%
+  ################
+  # Smile specific #786039 V4.0.0 : Tracker admin, flag to show only projects having it enabled
+  if only_enabled_projects
+    projects_not_having_tracker_enabled_or_parent.each do |p|
+-%>
+<%= hidden_field_tag('tracker[project_ids][]', '', :id => p.id) %>
+<%
+    end
+  end
+-%>
+<%= hidden_field_tag('tracker[project_ids][]', '', :id => nil) %>
+</fieldset>
+<% end %>
+</div>

@@ -1,0 +1,92 @@
+<%
+  # Smile specific :
+  # RM V4.0.0 OK
+  # * #164296 Liste des roles utilisant un statut
+-%>
+<%= title [l(:label_issue_status_plural), issue_statuses_path], @issue_status.name %>
+
+<%= labelled_form_for @issue_status do |f| %>
+  <%= render :partial => 'form', :locals => {:f => f} %>
+  <%= submit_tag l(:button_save) %>
+<% end %>
+
+<%
+  ################
+  # Smile specific #164296 Liste des roles utilisant un statut
+%>
+<br/>
+<br/>
+
+<h3><%= l(:label_workflow) %></h3>
+<%
+  ################
+  # Smile specific #164296 Liste des roles utilisant un statut
+  prev_role_name = nil
+  prev_tracker_id = nil
+  tracker = nil
+
+  workflows = WorkflowTransition.where(
+      "old_status_id=#{@issue_status.id} OR new_status_id=#{@issue_status.id}"
+    ).order(
+      'role_id, tracker_id, old_status_id, new_status_id'
+    ).all
+
+  workflows.each_with_index do |w, i|
+    next_role = workflows[i].role.name
+    if i < (workflows.size - 1)
+      next_role_name = workflows[i+1].role.name
+      next_tracker_id = workflows[i+1].tracker_id
+    else
+      next_role_name = nil
+      next_tracker_id = nil
+    end
+
+    if tracker.nil? || prev_tracker_id.nil? || (prev_tracker_id != w.tracker_id)
+      tracker = Tracker.find_by_id(w.tracker_id)
+    end
+
+    ###############
+    # 1/ Role block
+    if prev_role_name.nil? || (prev_role_name != w.role.name)
+-%>
+  <fieldset class="box role">
+    <legend><%= l('label_role') %> <b><%= w.role.name %></b></legend>
+<%
+    end
+
+    ##################
+    # 2/ Tracker block
+    if (prev_tracker_id != w.tracker_id) || (prev_role_name != w.role.name)
+-%>
+    <fieldset class="box tracker">
+      <legend><%= "#{l('label_tracker')}" %> <b><%= "#{h(tracker.name)}" %></b></legend>
+<%
+    end
+
+    old_status_name = (w.old_status ? w.old_status.name : '?')
+    new_status_name = (w.new_status ? w.new_status.name : '?')
+-%>
+      <%= link_to "#{old_status_name} → #{new_status_name}", {:controller => :workflows, :action => :edit, :role_id => w.role_id, :tracker_id => w.tracker_id, } %><br/>
+<%
+    # END -- 2/ Tracker block
+    #########################
+    if (next_tracker_id != w.tracker_id) || (next_role_name != w.role.name)
+-%>
+    </fieldset class="tracker">
+<%
+    end
+    if next_role_name != w.role.name
+
+-%>
+  </fieldset class="role">
+<%
+    end
+    # END -- 1/ Role block
+    ######################
+
+    prev_role_name = w.role.name
+    prev_tracker_id = w.tracker_id
+  end
+  # END -- Smile specific #164296 Liste des roles utilisant un statut
+  #######################
+-%>

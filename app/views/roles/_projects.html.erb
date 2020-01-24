@@ -1,0 +1,89 @@
+<%
+  # RM V4.0.0 OK
+  # Smile specific :
+  # * #89774 Administration des Rôles, liste des membres de projets ayant le rôle
+  #   new view template
+-%>
+<br/>
+<br/>
+<div class="box" id="projects">
+<h3><%= l(:label_project_plural) %></h3>
+<%
+  members_by_projects = {}
+  include_inherited = params[:include_inherited]
+  include_disabled = params[:include_disabled]
+  group_by_user = params[:group_by_user]
+
+  @role.member_roles.each do |member_role|
+    if member_role.member
+      member_project = member_role.member.project
+    else
+      member_project = nil
+    end
+
+    next if member_project.nil?
+
+    project_member = member_role.member.user
+    if project_member.nil?
+      project_member = Group.find_by_id(member_role.member.user_id)
+    else
+      next unless project_member.active? || (include_disabled == '1')
+    end
+
+    inherited_tag = ''
+
+    if member_role.inherited_from.present?
+      if include_inherited
+        inherited_member_role = MemberRole.find_by_id(member_role.inherited_from)
+        if inherited_member_role
+          inherited_tag = "#{inherited_member_role.member.project}: #{inherited_member_role.role} >> "
+        end
+      else
+        next
+      end
+    end
+
+    members_by_projects[member_project] ||= []
+
+    members_by_projects[member_project] <<
+      [project_member.id, project_member.name, project_member.is_a?(Group), project_member.mail, inherited_tag]
+  end
+
+  member_projects_keys = members_by_projects.keys.sort {|x,y| x.name <=> y.name}
+
+  i = 0
+  member_projects_keys.each do |project_key|
+    i += 1
+-%>
+  <fieldset>
+    <legend><%= i %>) <%= l(:label_project) %> <%= link_to( h(project_key.name), settings_project_path(project_key.id, :tab => 'members') ) %></legend>
+<%
+    members_for_project = members_by_projects[project_key]
+    members_for_project.sort!{|x,y| x[1] <=> y[1]}
+
+    members_for_project.each do |user_infos|
+      if user_infos[4]
+-%>
+    <span style="font-size: larger"><%= user_infos[4] %></span>
+<%
+      end
+
+      unless user_infos[2]
+-%>
+    <%= link_to( h(user_infos[1]), user_path(user_infos[0]) ) %> (<%= user_infos[3] %>)
+<%
+      else
+-%>
+    <%= l(:label_group) %> <%= link_to( h(user_infos[1]), group_path(user_infos[0]) ) %>
+<%
+      end
+-%>
+<br/>
+<%
+    end
+-%>
+  </fieldset>
+<%
+  end
+-%>
+</div>

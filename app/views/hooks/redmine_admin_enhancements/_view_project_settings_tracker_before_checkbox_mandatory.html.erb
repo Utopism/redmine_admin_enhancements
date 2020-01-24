@@ -1,0 +1,23 @@
+<%
+      ################
+      # Smile specific #114684 Add a new mandatory flag to the trackers
+      # Smile specific #781209 V4.0.0 : Project trackers setting : ability to remove mandatory tracker for admins
+      @tracker_mandatory_label = false
+
+      if tracker.respond_to?(:mandatory)
+        if tracker.mandatory
+          if project.new_record?
+            @tracker_checked = true
+          end
+
+          # If tracker was not mandatory, we let the choice to enable it now or not
+          unless User.current.admin?
+            @tracker_readonly = @tracker_checked
+          end
+
+          @tracker_mandatory_label = true
+        end
+      end
+      # END -- Smile specific #114684 Add a new mandatory flag to the trackers
+      #######################
+-%>
