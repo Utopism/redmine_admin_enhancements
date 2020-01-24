@@ -62,8 +62,7 @@ table, td, th {
 <%
   ################
   # Smile specific #782168 V4.0.0 : Plugin option to redirect all notifications to the action author
-  # TODO jebat extract this feature as a plugin
-  # when RM #11530 Support hooks in mailer is delivered (V4.1)
+  # TODO use hook, when RM #11530 Support hooks in mailer is delivered (V4.1)
   if defined?(@messages_mail_transfered_to_autor)
 -%>
 <%= render :partial => 'redirected_recipients', :formats => [:html], :locals => { :messages_mail_transfered_to_autor => @messages_mail_transfered_to_autor } %>

@@ -12,7 +12,6 @@ Overrides views to bring new features, to help Administrators managing Projects,
   * 🔑 Rewritten **admin/projects.html.erb**
   * 🔑 Rewritten **context_menus/issues.html.erb**
   * 🔑 Rewritten **custom_fields/_form.html.erb**
-    TODO get unsettable css
   * 🔑 Rewritten **issue_statuses/edit.html.erb**
   * 🔑 Rewritten **issue_statuses/index.html.erb**
   * 🔑 Rewritten **admin/projects.html.erb**
@@ -24,7 +23,6 @@ Overrides views to bring new features, to help Administrators managing Projects,
   * 🔑 Rewritten **projects/_form.html.erb**
   * 🔑 Rewritten **projects/copy.html.erb**
   * 🔑 Rewritten **projects/show.html.erb**
-       TODO get translation label_id
   * 🔑 Rewritten **projects/settings/_members.html.erb**
   * 🔑 Rewritten **roles/_form.html.erb**
   * New **roles/_members.html.erb**
@@ -40,8 +38,6 @@ Overrides views to bring new features, to help Administrators managing Projects,
   * 🔑 Rewritten **users/show.html.erb**
   * 🔑 Rewritten **workflows/_form.html.erb**
   * 🔑 Rewritten **workflows/copy.html.erb**
-
-TODO get expander css
 
 * New hooks in **hooks/redmine_admin_enhancements** :
 
@@ -76,5 +72,13 @@ TODO get expander css
     * **Subproject of**
 
   * Fixes links for Archive / Unarchive to **keep current Subproject of filter**
+
+## **TODOs**
+
+* README to finish
+* Enable expander css for projects/index action
+* Get translation label_id
+* Do migration to transfer migrations
+* Get unsettable css
 
 

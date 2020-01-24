@@ -115,7 +115,7 @@ module Smile
         # 1/ New method, RM 2.6 OK
         # Smile specific #321160 Role-based project custom field editability
         def editable_by?(project, user=User.current)
-          # TODO jebat manage relay role
+          # TODO Manage relay role
           return true if user.admin?
 
           return true if editable
