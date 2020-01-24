@@ -78,7 +78,6 @@ Overrides views to bring new features, to help Administrators managing Projects,
 * README to finish
 * Enable expander css for projects/index action
 * Get translation label_id
-* Do migration to transfer migrations
 * Get unsettable css
 
 
