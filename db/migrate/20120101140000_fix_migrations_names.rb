@@ -14,8 +14,9 @@ class FixMigrationsNames < migration
 
     say "5 migrations have changed of plugin, if you get an error, re-execute plugins migrations a second time, because old migration names are stored in memory cache"
 
-    # Reload schema_migrations to refresh moved migration names
-    User.connection.schema_cache.clear!
+    # Reload schema_migrations to refresh moved migration names -- does not work
+    #User.connection.schema_cache.clear!
+    #User.reset_column_information
   end
 
   def self.down
