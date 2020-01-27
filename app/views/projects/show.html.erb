@@ -47,7 +47,13 @@
   # Smile specific #267658 Aperçu Projet : affichage Id + date M-À-J
 -%>
     <li><%=l(:label_id)%>: <%= @project.id %></li>
+<%
+  if @project.respond_to?(:updated_on_from_issues)
+-%>
     <li><%=l(:field_updated_on)%>: <%= format_time(@project.updated_on_from_issues) || '?' %></li>
+<%
+  end
+-%>
   <% unless @project.homepage.blank? %>
     <li><span class="label"><%=l(:field_homepage)%>:</span> <%= link_to_if uri_with_safe_scheme?(@project.homepage), @project.homepage, @project.homepage %></li>
   <% end %>
