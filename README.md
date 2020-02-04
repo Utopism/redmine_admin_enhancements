@@ -22,6 +22,7 @@ Overrides views to bring new features, to help Administrators managing Projects,
   * 🔑 Rewritten **principal_memberships/_index.html.erb**
   * 🔑 Rewritten **projects/_form.html.erb**
   * 🔑 Rewritten **projects/copy.html.erb**
+  * 🔑 Rewritten **projects/destroy.html.erb**
   * 🔑 Rewritten **projects/show.html.erb**
   * 🔑 Rewritten **projects/settings/_members.html.erb**
   * 🔑 Rewritten **roles/_form.html.erb**
@@ -71,7 +72,7 @@ Overrides views to bring new features, to help Administrators managing Projects,
 
     * **Subproject of**
 
-  * Fixes links for Archive / Unarchive to **keep current Subproject of filter**
+  * Fixes links for *Archive* / *Unarchive* / *Delete* to **keep current Subproject of filter**
 
 ## **TODOs**
 

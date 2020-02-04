@@ -17,7 +17,7 @@ Redmine::Plugin.register plugin_name do
   author_url "mailto:Jerome BATAILLE <mail@jeromebataille.fr>?subject=#{plugin_name}"
   description 'Add enhancements in Administation backend (compatible with RM V2.6.10+)'
   url "https://github.com/Utopism/#{plugin_name}"
-  version '1.0.001'
+  version '1.0.002'
   requires_redmine :version_or_higher => '2.6.0'
 
   #Plugin home page
@@ -152,7 +152,7 @@ rails_dispatcher.to_prepare do
   Rails.logger.info "o=>----- CONTROLLERS"
 
   prepend_in(ProjectsController, Smile::Controllers::ProjectsOverride::CopyProjectPermission)
-  prepend_in(ProjectsController, Smile::Controllers::ProjectsOverride::ArchiveLinks)
+  prepend_in(ProjectsController, Smile::Controllers::ProjectsOverride::ActionsKeepFilters)
 
   prepend_in(AdminController, Smile::Controllers::AdminOverride::Enhancements)
 

@@ -6,7 +6,7 @@
 #   #367502 Création d'un projet à partir d'un template
 #   2015/06
 #
-# 2/ module ArchiveLinks
+# 2/ module ActionsKeepFilters
 # * InstanceMethods
 #   #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
 #   2015/10
@@ -83,7 +83,7 @@ module Smile
       end # module CopyProjectPermission
 
 
-      module ArchiveLinks
+      module ActionsKeepFilters
         def self.prepended(base)
           enhancements_instance_methods = [
             :archive,   # 1/ REWRITTEN, RM V4.0.0 OK
@@ -96,7 +96,7 @@ module Smile
 
           trace_first_prefix = "#{base.name}    instance_methods  "
           trace_prefix       = "#{' ' * (base.name.length + 15)}  --->  "
-          last_postfix       = '< (SM::CO::ProjectsOverride::ArchiveLinks)'
+          last_postfix       = '< (SM::CO::ProjectsOverride::ActionsKeepFilters)'
 
           SmileTools::trace_by_line(
             smile_instance_methods,
@@ -126,11 +126,31 @@ module Smile
             @project.unarchive
           end
 
+          ################
           # Smile specific #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
-          # Smile specific : params name, parent
+          # Smile specific : + params name, parent
           redirect_to_referer_or admin_projects_path(:status => params[:status], :name => params[:name], :parent => params[:parent])
         end
-      end # module ArchiveLinks
+
+        # 2/ REWRITTEN, RM 4.0.0 OK
+        # Smile specific #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
+        #
+        # Delete @project
+        def destroy
+          @project_to_destroy = @project
+          if api_request? || params[:confirm]
+            @project_to_destroy.destroy
+            respond_to do |format|
+              ################
+              # Smile specific : keep status, name, parent params
+              format.html { redirect_to admin_projects_path(:status => params[:status], :name => params[:name], :parent => params[:parent]) }
+              format.api  { render_api_ok }
+            end
+          end
+          # hide project in layout
+          @project = nil
+        end
+      end # module ActionsKeepFilters
     end # module ProjectsOverride
   end # module Controllers
 end # module Smile
