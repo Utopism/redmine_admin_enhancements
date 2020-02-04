@@ -53,7 +53,10 @@
     <% unless mod.blank? %>
         <tr class="group open">
           <td>
-            <span class="expander" onclick="toggleRowGroup(this);">&nbsp;</span>
+<%
+  # Issue #31433 of RM.org for RM > 4.1
+-%>
+            <span class="expander icon icon-expended" onclick="toggleRowGroup(this);">&nbsp;</span>
 <%
         ################
         # Smile specific #199041, Permissions par module, filtrer par module
