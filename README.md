@@ -4,6 +4,24 @@ redmine_admin_enhancements
 
 Redmine plugin that adds enhancements in Administation backend (compatible with RM V2.6.10+)
 
+# What it does
+
+* **Projects Administration** :
+
+  * New columms If filter **Subproject** of is set (to avoid to many queries)
+
+    These columns are useful to check before archiving / deleting a project
+
+    * **Issues (open) / Members / Subprojects**
+      * Issue count
+      * Opened Issue count
+      * Members count
+      * Sub-projects count
+
+    * **Subproject of**
+
+  * Fixes links for *Archive* / *Unarchive* / *Delete* to **keep current Subproject of filter**
+
 # How it works
 
 Overrides views to bring new features, to help Administrators managing Projects, Workflows, Roles, Users ...
@@ -56,29 +74,14 @@ Overrides views to bring new features, to help Administrators managing Projects,
   * Get issue's children (params : issue_id, sort)
   * Detect wrong root_id compared to parent_id
 
-## What it does
-
-* **Projects Administration** :
-
-  * New columms If filter **Subproject** of is set (to avoid to many queries)
-
-    These columns are useful to check before archiving / deleting a project
-
-    * **Issues (open) / Members / Subprojects**
-      * Issue count
-      * Opened Issue count
-      * Members count
-      * Sub-projects count
-
-    * **Subproject of**
-
-  * Fixes links for *Archive* / *Unarchive* / *Delete* to **keep current Subproject of filter**
-
-## **TODOs**
+# **TODOs**
 
 * README to finish
 * Enable expander css for projects/index action
 * Get translation label_id
 * Get unsettable css
 
+# Changelog
+
+* **V1.0.003**  Compatibility of migrations with Rails < 4.2
 
