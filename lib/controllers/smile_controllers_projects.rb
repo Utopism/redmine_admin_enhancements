@@ -57,13 +57,17 @@ module Smile
             next if f.filter != :require_admin
             # next if f.options[:only] != [ :archive, :unarchive, :destroy ]
 
-            SmileTools.trace_override "#{base.name}       before_action  #{f.filter} raw=#{f.raw_filter}  -- (SM::CO::IssuesOverride::CopyProjectPermission)"
+            SmileTools.trace_override "#{base.name}       before_action  #{f.filter} raw=#{f.raw_filter}  -- (SM::CO::IssuesOverride::CopyProjectPermission)",
+              true,
+              :redmine_admin_enhancements
           end
 
           base._process_action_callbacks.each do |f|
             next if f.filter != :can_copy_project
 
-            SmileTools.trace_override "#{base.name}       before_action  #{f.filter} raw=#{f.raw_filter}  -- (SM::CO::IssuesOverride::CopyProjectPermission)"
+            SmileTools.trace_override "#{base.name}       before_action  #{f.filter} raw=#{f.raw_filter}  -- (SM::CO::IssuesOverride::CopyProjectPermission)",
+              true,
+              :redmine_admin_enhancements
           end
           # END -- Smile specific #367502 Création d'un projet à partir d'un template
           #######################

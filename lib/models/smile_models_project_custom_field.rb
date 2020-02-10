@@ -60,8 +60,14 @@ module Smile
           end
 
 
-          SmileTools.trace_override "#{base.name}                hbtm  projects " + last_postfix
-          SmileTools.trace_override "#{base.name}                  sa  project_ids " + last_postfix
+          SmileTools.trace_override "#{base.name}                hbtm  projects " + last_postfix,
+            true,
+            :redmine_admin_enhancements
+
+          SmileTools.trace_override "#{base.name}                  sa  project_ids " + last_postfix,
+            true,
+            :redmine_admin_enhancements
+
           base.instance_eval do
             has_and_belongs_to_many :projects, :join_table => "#{table_name_prefix}custom_fields_projects#{table_name_suffix}", :foreign_key => "custom_field_id"
 
