@@ -2,6 +2,7 @@
   # Smile specific
   # RM V4.0.0 OK
   # * #416586 Profil utilisateur : afficher clé d'API pour Admin
+  # * Plugin specific : activities introduced with V4.0.0
 -%>
 <div class="contextual">
 <%= link_to(l(:button_edit), edit_user_path(@user), :class => 'icon icon-edit') if User.current.admin? && @user.logged? %>
@@ -65,7 +66,15 @@
 <h3><%= link_to l(:label_activity), :controller => 'activities',
                 :action => 'index', :id => nil, :user_id => @user,
                 :from => @events_by_day.keys.first %></h3>
+<%
+  #################
+  # Plugin specific : activities introduced with V4.0.0
+  if Redmine::VERSION::MAJOR >= 4
+-%>
 <%= render :partial => 'activities/activities', :locals => {:events_by_day => @events_by_day} %>
+<%
+  end
+-%>
 
 <% other_formats_links do |f| %>
   <%= f.link_to 'Atom', :url => {:controller => 'activities', :action => 'index', :id => nil, :user_id => @user, :key => User.current.rss_key} %>
