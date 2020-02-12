@@ -113,7 +113,7 @@ module Smile
           ################
           # Smile specific #782168 V4.0.0 : Plugin option to redirect all notifications to the action author
           redirect_notifications_to_author = (
-              Setting.plugin_redmine_smile_enhancements['redirect_notifications_to_author'] &&
+              Setting.plugin_redmine_admin_enhancements['redirect_notifications_to_author'] &&
               @author.present? &&
               @author.mail.present?
             )
