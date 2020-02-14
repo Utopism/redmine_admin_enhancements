@@ -145,15 +145,17 @@ module Smile
 
           #---------------
           # 2/ Relay roles
-          relay_roles_for_project_for_user = user.relay_roles_for_project(project, true)
-          logger.debug " =>roles   relay_roles_for_project_for_user=#{relay_roles_for_project_for_user.collect(&:name)}"
+          if user.respond_to?('relay_roles_for_project')
+            relay_roles_for_project_for_user = user.relay_roles_for_project(project, true)
+            logger.debug " =>roles   relay_roles_for_project_for_user=#{relay_roles_for_project_for_user.collect(&:name)}"
 
-          relay_roles_for_project_for_user_for_cf = roles & relay_roles_for_project_for_user
+            relay_roles_for_project_for_user_for_cf = roles & relay_roles_for_project_for_user
 
-          if relay_roles_for_project_for_user_for_cf.present?
-            logger.debug "/=>roles   OK  #{relay_roles_for_project_for_user_for_cf.collect(&:name)}"
+            if relay_roles_for_project_for_user_for_cf.present?
+              logger.debug "/=>roles   OK  #{relay_roles_for_project_for_user_for_cf.collect(&:name)}"
 
-            return true
+              return true
+            end
           end
 
           logger.debug "/=>roles   KO"
