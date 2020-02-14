@@ -14,12 +14,12 @@ module Smile
       module HideChildren
         def self.prepended(base)
           hide_children_instance_methods = [
-            :render_project_hierarchy, # 1/ OVERRIDEN rewritten RM 4.0.0 OK
+            :render_project_hierarchy, # 1/ REWRITTEN RM 4.0.0 OK
           ]
 
 
           base.module_eval do
-            # 1/ OVERRIDEN rewritten, RM 4.0.0 OK
+            # 1/ REWRITTEN, RM 4.0.0 OK
             # Smile specific #229028 Projects list : button to hide / show sub-projects
             #
             # Renders the projects index
