@@ -30,7 +30,7 @@ module Smile
           #             - methods already present in QueriesHelper -- OK
           #             - Pb. 2 : new methods in the modules included -- NON-OK
           base.module_eval do # <<READER, __FILE__, (__LINE__ + 1) #does not work
-            # 1/ REWRITTEN, RM 4.0.0 OK  SMILE
+            # 1/ New method, RM 4.0.0 OK  SMILE
             # Smile specific #67860 Désactivation des rôles obsolètes lors de l'ajout d'un membre dans un projet
             def roles_settable_hook(roles, debug=nil)
               [
