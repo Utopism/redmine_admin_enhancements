@@ -178,7 +178,7 @@ Overrides views to bring new features, to help Administrators managing Projects,
     * smile_helpers_projects
       * 🔑 Rewritten method **render_project_hierarchy**
     * smile_helpers_queries
-    * New method **roles_settable_hook**
+      * New method **roles_settable_hook**
 
   * **models**
     * **smile_models_mailer**
