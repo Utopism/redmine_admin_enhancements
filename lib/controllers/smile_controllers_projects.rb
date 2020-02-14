@@ -92,6 +92,7 @@ module Smile
           enhancements_instance_methods = [
             :archive,   # 1/ REWRITTEN, RM V4.0.0 OK
             :unarchive, # 2/ REWRITTEN, RM V4.0.0 OK
+            :destroy,   # 3/ REWRITTEN, RM V4.0.0 OK
           ]
 
           smile_instance_methods = base.instance_methods.select{|m|
@@ -136,7 +137,7 @@ module Smile
           redirect_to_referer_or admin_projects_path(:status => params[:status], :name => params[:name], :parent => params[:parent])
         end
 
-        # 2/ REWRITTEN, RM 4.0.0 OK
+        # 3/ REWRITTEN, RM 4.0.0 OK
         # Smile specific #416800 Admin projets : archiver / désarchiver ne reste pas sur les filtres courants
         #
         # Delete @project
