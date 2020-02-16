@@ -58,7 +58,7 @@ Notifications will be redirected to the User that as made the modification.
 
 # How it works
 
-## Overrides Views / Partials in **app/views**
+## 1/ Overrides Views / Partials in **app/views**
 
 To bring new features, to help Administrators managing Projects, Workflows, Roles, Users ...
 
@@ -177,7 +177,7 @@ To bring new features, to help Administrators managing Projects, Workflows, Role
 
   Workflow copy : Destination Tracker/Role select with **10 lines** instead of 4
 
-## **Overrides** in lib/
+## 2/ **Overrides** in lib/
 
 * **controllers**
   * smile_controllers_admin
@@ -231,7 +231,7 @@ To bring new features, to help Administrators managing Projects, Workflows, Role
 
       User memberships, params to show archived projects
 
-## New hooks in **hooks/redmine_admin_enhancements** :
+## 3/ New hooks in **hooks/redmine_admin_enhancements** :
 
 New **mandatory** flag for **Trackers**
 
@@ -242,19 +242,19 @@ New **mandatory** flag for **Trackers**
 * On **view_project_settings_tracker_after_checkbox**
   view_project_settings_tracker_after_checkbox_mandatory
 
-## New permissions :
+## 4/ New permissions :
 
 * **add_public_project**
 * **copy_project**
 
-## New task to fix problems with issues trees :
+## 5/ New task to fix problems with issues trees :
 
 **smile_tools_tree.rake** :
 * Repair ciruclar references of issues (params : root_id, dry_run)
 * Get issue's children (params : issue_id, sort)
 * Detect wrong root_id compared to parent_id
 
-## New **migrations** :
+## 6/ New **migrations** :
 
 * 20121011130000_add_tracker_mandatory
 * 20150102150000_add_role_settable
