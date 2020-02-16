@@ -17,3 +17,5 @@ ca:
 
   #322539 Utilisation d'un nouveau champ *settable*
   field_settable: Ajustable
+
+  label_id: Id

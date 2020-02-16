@@ -16,3 +16,5 @@ fr:
 
   #322539 Utilisation d'un nouveau champ *settable*
   field_settable: Activable
+
+  label_id: Id

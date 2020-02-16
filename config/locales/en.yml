@@ -16,3 +16,5 @@ en:
 
   #322539 Utilisation d'un nouveau champ *settable*
   field_settable: Settable
+
+  label_id: '#'

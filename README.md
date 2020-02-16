@@ -241,10 +241,13 @@ Overrides views to bring new features, to help Administrators managing Projects,
 # **TODOs**
 
 * Enable expander css for projects/index action
-* Get translation label_id
 * Get unsettable css
 
 # Changelog
+
+* **V1.0.004**  TODO fixed
+
+  + translation label_id
 
 * **V1.0.003**  Compatibility of migrations with Rails < 4.2
 
