@@ -57,6 +57,12 @@ module Smile
                 s
               end
 
+              ###########################################################################
+              # Smile specific #229028 Projects list : button to hide / show sub-projects
+              s_with_js << content_for(:header_tags) do
+                  stylesheet_link_tag 'expander.css', :plugin => 'redmine_admin_enhancements', :media => 'all'
+               end
+
               # Smile specific #229028 Projects list : button to hide / show sub-projects
               s_with_js
             end

@@ -3,11 +3,11 @@
  * Smile specific 2014 #229028 Projects list : button to hide / show sub-projects
  *******************/
 div.closed span.expander {
-	background-image: url(../../../../images/bullet_toggle_plus.png);
+	background-image: url(../../../images/bullet_toggle_plus.png);
 }
 
 div span.expander {
-	background-image: url(../../../../images/bullet_toggle_minus.png);
+	background-image: url(../../../images/bullet_toggle_minus.png);
 	padding-left: 8px;
 	margin-left: 0;
 	cursor: pointer;

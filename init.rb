@@ -17,7 +17,7 @@ Redmine::Plugin.register plugin_name do
   author_url "mailto:Jerome BATAILLE <mail@jeromebataille.fr>?subject=#{plugin_name}"
   description 'Add enhancements in Administation backend (compatible with RM V2.6.10+)'
   url "https://github.com/Utopism/#{plugin_name}"
-  version '1.0.003'
+  version '1.0.004'
   requires_redmine :version_or_higher => '2.6.0'
 
   #Plugin home page

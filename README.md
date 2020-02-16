@@ -6,248 +6,278 @@ Redmine plugin that adds enhancements in Administation backend (compatible with 
 
 # What it does
 
-* **Projects Administration** :
+## **Projects Administration** :
 
-  * New columms If filter **Subproject** of is set (to avoid to many queries)
+* New columms in **Project list** page if filter **Subproject** of is set (to avoid to many queries)
 
-    These columns are useful to check before archiving / deleting a project
+  These columns are useful to make some checks before **(Un-)Archiving / Deleting** a project :
 
-    * **Issues (open) / Members / Subprojects**
-      * Issue count
-      * Opened Issue count
-      * Members count
-      * Sub-projects count
+  * **Issues (open) / Members / Subprojects**, this column includes :
+    * Issue count
+    * Opened Issue count
+    * Members count
+    * Sub-projects count
 
-    * **Subproject of**
+  * **Subproject of**
 
-  * Fixes links for *Archive* / *Unarchive* / *Delete* to **keep current filters**
+* Fixes links for *Archive* / *Unarchive* / *Delete* to **keep current filters**
 
-* **Assignee** selection in **Issues context menu**
-  * **Nobody** at the beginning
+## **Custom Fields Administration** : Role-based **Project custom field** editability
 
-* Role-based Project custom field editability
+Allows to **restrict Project Custom Fields edition** to some roles
 
-  Allows to **restrict Project Custom Fields edition** to some roles
+## **Trackers Administration** : new **Mandatory** flag
 
-* New **mandatory** flag for **Trackers**
+These trackers set as mandatory once enabled **can not be unchecked** in the **Project configuration** (except by Administrators)
 
-  These trackers can not be removed from the project configuration, once enabled
+## **Roles Administration** : role access restriction
 
-* Notifications option in plugin configuration : **redirect all notifications to the action author**
+Add a new **Settable** flag to Roles.
+When set, the role is only **givable by admins** or by **members of a group** specified in role configuration.
+Un-settable Roles set on members in projects before the role was set unsettable stay as is.
 
-  Usefull for Testing servers having a dump of production data : avoid to send notifications to real users.
+You can use css in your **Redmine themes** to emphasis these unsettable roles, in **projects members configuration**.
 
-* Roles restriction
+* For example :
+```css
+.unsettable {
+  color: #eb3664;
+  font-style: italic;
+}
+```
 
-  Add a new *Settable* flag to Roles.
-  When set, the role is only **givable by admins** or by **members of a group** specified in role configuration
+## Notifications option in plugin configuration : **redirect all notifications to the action author**
+
+Usefull for Testing servers having a dump of production data : avoid to send notifications to real users.
+Notifications will be redirected to the User that as made the modification.
+
+## **Issues context menu**, present on right click in each Issues table list
+
+* **Assignee** selection : **Nobody** at the beginning
+
 
 # How it works
 
-Overrides views to bring new features, to help Administrators managing Projects, Workflows, Roles, Users ...
+## Overrides Views / Partials in **app/views**
 
-* Views / Partials in **app/views** :
-  * 🔑 Rewritten **admin/projects.html.erb**
+To bring new features, to help Administrators managing Projects, Workflows, Roles, Users ...
 
-    New filters and informations on projects
+* 🔑 REWRITTEN **admin/projects.html.erb**
 
-  * 🔑 Rewritten **context_menus/issues.html.erb**
+  New filters and informations on projects
 
-    Assignee selection in Issues context menu : Nobody at the beginning
+* 🔑 REWRITTEN **context_menus/issues.html.erb**
 
-  * 🔑 Rewritten **custom_fields/_form.html.erb**
+  Assignee selection in Issues context menu : **Nobody** at the beginning
 
-    * Issue Custom Field Edition : list of projects using the custom field
+* 🔑 REWRITTEN **custom_fields/_form.html.erb**
 
-      Not full projects list, only the ones that have the custom field enabled, with parent projects.
+  * Issue Custom Field Edition : new filtered list of **projects using the custom field**
 
-    * Role-based Project custom field editability
+    Not full projects list, only the ones that **have the custom field enabled**, including parent projects to see the projects tree.
 
-      Allows to **restrict Project Custom Fields edition** to some roles
+  * Role-based Project custom field editability
 
-      This is the base to enable new features through a Custom Field that only some people can enable.
+    Allows to **restrict Project Custom Fields edition** to some roles
 
-    * Custom Field edition : do not localize name if Localizable plugin is enabled
+    This is the base to **enable new features through a Custom Field** that **only some people can enable**.
 
-  * New **mandatory** flag for **Trackers** :
+  * Custom Field edition : do not localize name if **Localizable plugin** is enabled
 
-    * hooks/_view_project_settings_tracker_after_checkbox_mandatory.html.erb
-    * hooks/_view_project_settings_tracker_before_checkbox_mandatory.html.erb
-    * hooks/_view_projects_show_sidebar_bottom_empty_because_mandatory.html.erb
+* New **mandatory** flag for **Trackers** :
 
-  * 🔑 Rewritten **issue_statuses/edit.html.erb**
+  * hooks/_view_project_settings_tracker_after_checkbox_mandatory.html.erb
+  * hooks/_view_project_settings_tracker_before_checkbox_mandatory.html.erb
+  * hooks/_view_projects_show_sidebar_bottom_empty_because_mandatory.html.erb
 
-    Issue Status edition : list of **roles using a specific status**, by role and tracker
+* 🔑 REWRITTEN **issue_statuses/edit.html.erb**
 
-  * 🔑 Rewritten **issue_statuses/index.html.erb**
+  Issue Status edition : list of **roles using a specific status**, by role and tracker
 
-    Issue Statuses list : Position value indication
+* 🔑 REWRITTEN **issue_statuses/index.html.erb**
 
-  * Option in plugin configuration : **redirect all notifications to the action author** :
-    * 🔑 Rewritten **layouts/mailer.html.erb**
-    * New **mailer/_redirected_recipients.html.erb**
+  Issue Statuses list : new Status position column
 
-  * Add a new *Settable* flag to Roles to restrict some roles access.
+* Option in plugin configuration : **redirect all notifications to the action author** :
+  * 🔑 REWRITTEN **layouts/mailer.html.erb**
+  * New **mailer/_redirected_recipients.html.erb**
 
-    Roles only givable by admins or by the members of a group specified in the role configuration
-    * 🔑 Rewritten **members/_edit.html.erb**
-    * 🔑 Rewritten **members/_new_form.html.erb**
-  * 🔑 Rewritten **principal_memberships/_index.html.erb**
+* Add a new **Settable** flag to Roles to restrict some roles access.
 
-    New param to show archived projects.
+  Roles only givable by admins or by the members of a group specified in the role configuration
+  * 🔑 REWRITTEN **members/_edit.html.erb**
+  * 🔑 REWRITTEN **members/_new_form.html.erb**
+* 🔑 REWRITTEN **principal_memberships/_index.html.erb**
 
-  * 🔑 Rewritten **projects/_form.html.erb**
-    * Disable public project creation on a role basis
-    * Role-based project custom field editability
-  * 🔑 Rewritten **projects/copy.html.erb**
+  New param to **show archived projects**, that are normally hidden.
 
-    Project copy : members replication not checked by default
+* 🔑 REWRITTEN **projects/_form.html.erb**
+  * Disable public project creation on a role basis
+  * Role-based project custom field editability
+* 🔑 REWRITTEN **projects/copy.html.erb**
 
-  * 🔑 Rewritten **projects/destroy.html.erb**
+  Project copy : members replication not checked by default
 
-    Keep params added in projects index
+* 🔑 REWRITTEN **projects/destroy.html.erb**
 
-  * 🔑 Rewritten **projects/show.html.erb**
-    * Copy project link on Project show
-    * + **Id** and **Last update date** fields
-  * 🔑 Rewritten **projects/settings/_members.html.erb**
+  Keep params added in projects index (filter on Sub-project, etc.)
 
-    Members roles : display group of role
+* 🔑 REWRITTEN **projects/show.html.erb**
+  * Copy project link on Project show
+  * + **Id** and **Last update date** fields
+* 🔑 REWRITTEN **projects/settings/_members.html.erb**
 
-  * 🔑 Rewritten **roles/_form.html.erb**
+  Members roles : **display group of role**
 
-    Add a new *Settable* flag to Roles to restrict some roles access.
+* 🔑 REWRITTEN **roles/_form.html.erb**
 
-  *  List of projects members having this role
-    * New **roles/_members.html.erb**
-    * New **roles/_projects.html.erb**
-    * 🔑 Rewritten **roles/edit.html.erb**
-  * 🔑 Rewritten **roles/index.html.erb**
+  Add a new **Settable** flag to Roles to restrict some roles access.
 
-    Add a new *Settable* flag to Roles to restrict some roles access.
+*  List of projects members having this role
+  * New **roles/_members.html.erb**
+  * New **roles/_projects.html.erb**
+  * 🔑 REWRITTEN **roles/edit.html.erb**
+* 🔑 REWRITTEN **roles/index.html.erb**
 
-  * 🔑 Rewritten **roles/permissions.html.erb**
+  Add a new **Settable** flag to Roles to restrict some roles access.
 
-    Link on group permissions to show only the permissions of this group
+* 🔑 REWRITTEN **roles/permissions.html.erb**
 
-  * New **settings/_redmine_admin_enhancements.html.erb**
+  Link on group permissions to filter permissions to **show only the permissions of this group**
 
-    Option in plugin configuration : **redirect all notifications to the action author**
+* New **settings/_redmine_admin_enhancements.html.erb**
 
-  * 🔑 Rewritten **trackers/_form.html.erb**
-    * Add a new mandatory flag to the trackers
-    * Flag to show only projects having tracker enabled
-    * Tracker edition : link to project
+  Option in plugin configuration : **redirect all notifications to the action author**
 
-  * 🔑 Rewritten **trackers/index.html.erb**
-    * Add a new mandatory flag to the trackers
+* 🔑 REWRITTEN **trackers/_form.html.erb**
+  * Add a new mandatory flag to the trackers
+  * Flag to show only projects having tracker enabled
+  * Tracker edition : link to project
 
-  * 🔑 Rewritten **users/_groups.html.erb**
+* 🔑 REWRITTEN **trackers/index.html.erb**
+  * Add a new mandatory flag to the trackers
 
-    User groups : show only the groups the user is member of with parameter **only_member**
+* 🔑 REWRITTEN **users/_groups.html.erb**
 
-  * 🔑 Rewritten **users/mail_notifications.html.erb**
+  User groups : show only the groups the user is member of with parameter **only_member**
 
-    Added link to projects
+* 🔑 REWRITTEN **users/mail_notifications.html.erb**
 
-  * 🔑 Rewritten **users/show.html.erb**
+  Added link to projects
 
-    * Display user API key for Administrators only
+* 🔑 REWRITTEN **users/show.html.erb**
 
-  * 🔑 Rewritten **workflows/_form.html.erb**
-    **Only display statuses that are used by this tracker** : removes more columns and lines with no status enabled
+  * Display **user API key** for Administrators only
 
-  * 🔑 Rewritten **workflows/copy.html.erb**
+* 🔑 REWRITTEN **workflows/_form.html.erb**
 
-    Workflow copy : Destination Tracker/Role select with 10 lines instead of 4
+  **Only display statuses that are used by this tracker** : removes more columns and lines with no status enabled
 
-* **Overrides** in lib/
-  * **controllers**
-    * smile_controllers_admin
-      * 🔑 Rewritten method **projects**
+* 🔑 REWRITTEN **workflows/copy.html.erb**
 
-        Show issues count
+  Workflow copy : Destination Tracker/Role select with **10 lines** instead of 4
 
-    * smile_controllers_projects
-      * New permission **can_copy_project**
-      * 🔑 Rewritten method **archive**
-      * 🔑 Rewritten method **unarchive**
-      * 🔑 Rewritten method **destroy**
+## **Overrides** in lib/
 
-  * **helpers**
-    * smile_helpers_projects
-      * 🔑 Rewritten method **render_project_hierarchy**
-    * smile_helpers_queries
-      * New method **roles_settable_hook**
+* **controllers**
+  * smile_controllers_admin
+    * 🔑 REWRITTEN method **projects**
 
-  * **models**
-    * **smile_models_mailer**
-      * 🔑 Rewritten method **mail**
-      * 🔑 Rewritten class method **email_addresses**
-    * **smile_models_project**
-      * New method **editable_custom_field_values**
-      * 🔑 Extended **safe_attributes=**
-      * New scope **having_parent**
+      Prepare issues count for view.
 
-    * **smile_models_project_custom_field**
-      * New method **editable_by?**
-      * New method **bool_custom_value_set_on=**
-      * New method **reset_available_custom_fields**
+  * smile_controllers_projects
+    * New permission **can_copy_project**
+    * To **use / keep** in Url redirection **new filters** added in Projects Administration list :
+      * 🔑 REWRITTEN method **archive**
+      * 🔑 REWRITTEN method **unarchive**
+      * 🔑 REWRITTEN method **destroy**
 
-    * **smile_models_role**
-      * New method **unsettable_exception_group**
-      * New method **visible?**
-      * New class method **exclude_unsettable**
-      * New class method **only_unsettable**
-      * New safe attribute **settable**
-      * New safe attribute **unsettable_exception_groupname**
+* **helpers**
+  * smile_helpers_projects
+    * 🔑 REWRITTEN method **render_project_hierarchy**
 
-    * **smile_models_tracker**
-      * New safe attribute **mandatory**
+    Links to **hide / show sub-projects**
 
-    * **smile_models_user**
-      * New has_many **memberships_all**
+  * smile_helpers_queries
+    * New method **roles_settable_hook**
 
-        User memberships, params to show archived projects
+* **models**
+  * **smile_models_mailer** to allow **redirect all notifications to the action author** :
+    * 🔑 REWRITTEN method **mail**
+    * 🔑 REWRITTEN class method **email_addresses**
+  * **smile_models_project**
+    * New method **editable_custom_field_values**
+    * **Extended** **safe_attributes=**
+    * New scope **having_parent**
 
-* New hooks in **hooks/redmine_admin_enhancements** for
-  New **mandatory** flag for **Trackers**
+  * **smile_models_project_custom_field**
+    * New method **editable_by?**
+    * New method **bool_custom_value_set_on=**
+    * New method **reset_available_custom_fields**
 
-  * On **view_projects_show_sidebar_bottom**
-    view_projects_show_sidebar_bottom_empty_because_mandatory
-  * On **view_project_settings_tracker_before_checkbox**
-    view_project_settings_tracker_before_checkbox_mandatory
-  * On **view_project_settings_tracker_after_checkbox**
-    view_project_settings_tracker_after_checkbox_mandatory
+  * **smile_models_role**
+    * New method **unsettable_exception_group**
+    * New method **visible?**
+    * New class method **exclude_unsettable**
+    * New class method **only_unsettable**
+    * New safe attribute **settable**
+    * New safe attribute **unsettable_exception_groupname**
 
-* New permissions :
-  * **add_public_project**
-  * **copy_project**
+  * **smile_models_tracker**
+    * New safe attribute **mandatory**
 
-* New task to fix problems with issues trees :
+  * **smile_models_user**
+    * New has_many **memberships_all**
 
-  **smile_tools_tree.rake**
-  * Repair ciruclar references of issues (params : root_id, dry_run)
-  * Get issue's children (params : issue_id, sort)
-  * Detect wrong root_id compared to parent_id
+      User memberships, params to show archived projects
 
- * New **migrations** :
-   * 20121011130000_add_tracker_mandatory
-   * 20150102150000_add_role_settable
-   * 20190311183500_add_issues_subject_index
-   * 20190503170000_add_role_unsettable_exception_groupname.rb
-   * 20191102224500_add_journal_details_journal_id_prop_key_index
+## New hooks in **hooks/redmine_admin_enhancements** :
+
+New **mandatory** flag for **Trackers**
+
+* On **view_projects_show_sidebar_bottom**
+  view_projects_show_sidebar_bottom_empty_because_mandatory
+* On **view_project_settings_tracker_before_checkbox**
+  view_project_settings_tracker_before_checkbox_mandatory
+* On **view_project_settings_tracker_after_checkbox**
+  view_project_settings_tracker_after_checkbox_mandatory
+
+## New permissions :
+
+* **add_public_project**
+* **copy_project**
+
+## New task to fix problems with issues trees :
+
+**smile_tools_tree.rake** :
+* Repair ciruclar references of issues (params : root_id, dry_run)
+* Get issue's children (params : issue_id, sort)
+* Detect wrong root_id compared to parent_id
+
+## New **migrations** :
+
+* 20121011130000_add_tracker_mandatory
+* 20150102150000_add_role_settable
+* 20190311183500_add_issues_subject_index
+* 20190503170000_add_role_unsettable_exception_groupname.rb
+* 20191102224500_add_journal_details_journal_id_prop_key_index
 
 # **TODOs**
 
-* Enable expander css for projects/index action
-* Get unsettable css
+* Plugin option to redirect all notifications to the action author
+
+  TODO use hook, when RM #11530 Support hooks in mailer is delivered (V4.1)
+
+* Translate **permission_add_public_project** for ca(talan) language
+
+* Role-based project custom field editability : Manage **Relay role** in **editable_by?**
+
+  Specific to other plugins using this one.
 
 # Changelog
 
-* **V1.0.004**  TODO fixed
+* **V1.0.004**  Old TODOs fixed
 
-  + translation label_id
+  + translation label_id, + expander header css link for **projects/index** action
 
 * **V1.0.003**  Compatibility of migrations with Rails < 4.2
-
