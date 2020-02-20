@@ -1,0 +1,69 @@
+<%
+  ################
+  # Smile specific :
+  # * Added column to show Tracker enabled for Custom Field if there is only one Tracker
+  #   2020
+-%>
+<table class="list custom_fields">
+  <thead><tr>
+    <th><%=l(:field_name)%></th>
+    <th><%=l(:field_field_format)%></th>
+    <th><%=l(:field_is_required)%></th>
+    <% if tab[:name] == 'IssueCustomField' %>
+      <th><%=l(:field_is_for_all)%></th>
+<%
+  ################
+  # Smile specific : show Tracker enabled
+-%>
+      <th><%=l(:label_tracker_plural)%></th>
+      <th><%=l(:label_used_by)%></th>
+    <% end %>
+    <th></th>
+  </tr></thead>
+  <tbody>
+<%
+  ################
+  # Smile specific : show Tracker enabled
+  all_trackers_count = ::Tracker.count
+-%>
+
+  <% (@custom_fields_by_type[tab[:name]] || []).sort.each do |custom_field| -%>
+    <% back_url = custom_fields_path(:tab => tab[:name]) %>
+<%
+    ################
+    # Smile specific : show Tracker enabled
+    if tab[:name] == 'IssueCustomField'
+      trackers_count = custom_field.trackers.count
+
+      if trackers_count == all_trackers_count
+        label_trackers = l(:label_tracker_all)
+      elsif trackers_count > 1
+        label_trackers = l(:field_multiple)
+      elsif trackers_count == 1
+        label_trackers = custom_field.trackers.first.name
+      else
+        label_trackers = l(:label_none).capitalize
+      end
+    end
+-%>
+    <tr>
+      <td class="name"><%= link_to custom_field.name, edit_custom_field_path(custom_field) %></td>
+      <td><%= l(custom_field.format.label) %></td>
+      <td><%= checked_image custom_field.is_required? %></td>
+      <% if tab[:name] == 'IssueCustomField' %>
+      <td><%= checked_image custom_field.is_for_all? %></td>
+<%
+    ################
+    # Smile specific : show Tracker enabled
+-%>
+      <td><%= label_trackers %></td>
+      <td><%= l(:label_x_projects, :count => @custom_fields_projects_count[custom_field.id] || 0) if custom_field.is_a? IssueCustomField and !custom_field.is_for_all? %></td>
+      <% end %>
+      <td class="buttons">
+        <%= reorder_handle(custom_field, :url => custom_field_path(custom_field), :param => 'custom_field') %>
+        <%= delete_link custom_field_path(custom_field) %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

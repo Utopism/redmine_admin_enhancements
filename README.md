@@ -276,6 +276,7 @@ New **mandatory** flag for **Trackers**
 
 # Changelog
 
+* **V1.0.005**  Custom Fields list : Added column to show Tracker enabled for Custom Field if there is only one Tracker
 * **V1.0.004**  Old TODOs fixed
 
   + translation label_id, + expander header css link for **projects/index** action
